@@ -18,7 +18,7 @@ Search and replace these placeholders in all HTML files:
 - `YOUR_COMPANY_NUMBER`
 - `Office 20935 182-184 High Street North, London, E6 2JA`
 - `kodjo_baah@hotmail.com`
-- `YOUR_DOMAIN_NAME`
+- `modainteract.com`
 
 ## Free deployment options
 
