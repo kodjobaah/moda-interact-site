@@ -2,6 +2,10 @@
 
 This bundle contains a simple static company website for Moda Interact Ltd.
 
+## Live site
+
+- Deployed site: https://www.modainteract.com/
+
 ## Files
 
 - `index.html`
