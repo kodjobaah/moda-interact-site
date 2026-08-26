@@ -265,6 +265,23 @@ h1 {
   color: var(--brand-900);
 }
 
+.video-wrap {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.video-wrap video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 18px;
+  background: #0b0f0d;
+  aspect-ratio: 16 / 9;
+}
+
 .cta {
   margin: 10px 0 72px;
   background:
