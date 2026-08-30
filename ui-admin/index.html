@@ -65,7 +65,7 @@
             <div class="flex-1 max-w-2xl">
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fas fa-search"></i></span>
-                    <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm" placeholder="Global Quick Find (Domain or Brand)...">
+                    <input type="text" id="global-tenant-search" oninput="filterTenants()" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm" placeholder="Search tenants by brand name or domain...">
                 </div>
             </div>
         </header>
@@ -96,14 +96,14 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Billing Plan</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody id="tenant-table-body" class="bg-white divide-y divide-gray-200">
                         
-                        <!-- Row 1: Clickable Master Row -->
-                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="toggleRow('detail-ta', 'icon-ta')">
+                        <!-- Tenant 1: Trending Apparel -->
+                        <tr class="tenant-row hover:bg-gray-50 transition-colors cursor-pointer" data-name="trending apparel" data-domain="trending-apparel.myshopify.com" onclick="toggleRow('detail-ta', 'icon-ta')">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <i id="icon-ta" class="fas fa-chevron-right text-gray-400 mr-4 text-sm w-4 transition-transform"></i>
-                                    <div class="h-10 w-10 rounded bg-gray-200 flex items-center justify-center text-gray-500 font-bold">TA</div>
+                                    <div class="h-10 w-10 rounded bg-brand-100 text-brand-800 flex items-center justify-center font-bold">TA</div>
                                     <div class="ml-4">
                                         <div class="text-sm font-bold text-gray-900">Trending Apparel</div>
                                         <div class="text-sm text-gray-500">trending-apparel.myshopify.com</div>
@@ -114,17 +114,14 @@
                             <td class="px-6 py-4 text-sm text-gray-700">Pro Tier</td>
                         </tr>
 
-                        <!-- Row 1: Expanded Detail View (Hidden by default) -->
+                        <!-- Expanded Detail View for Tenant 1 -->
                         <tr id="detail-ta" class="hidden bg-gray-50 border-b-2 border-gray-200 shadow-inner">
                             <td colspan="3" class="px-10 py-6">
-                                
-                                <!-- Tabs -->
                                 <div class="flex space-x-6 border-b border-gray-200 mb-6 pb-2">
                                     <button id="tab-admin" onclick="switchTab('admin', 'logs')" class="text-brand-700 font-semibold border-b-2 border-brand-700 pb-2">Administration</button>
                                     <button id="tab-logs" onclick="switchTab('logs', 'admin')" class="text-gray-500 font-medium pb-2 hover:text-gray-700 border-b-2 border-transparent">Recovery Logs</button>
                                 </div>
 
-                                <!-- Tab Content 1: Administration -->
                                 <div id="content-admin" class="grid grid-cols-2 gap-6 fade-in">
                                     <div class="bg-white p-5 border border-gray-200 rounded-lg shadow-sm">
                                         <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Shopify Lifecycle & Status</h4>
@@ -135,7 +132,6 @@
                                                     <option selected>ACTIVE</option>
                                                     <option>SUSPENDED</option>
                                                 </select>
-                                                <p class="text-[11px] text-gray-400 mt-1 italic">Note: 'Uninstalled' is handled automatically via Shopify webhook.</p>
                                             </div>
                                             <div>
                                                 <span class="block text-xs font-medium text-gray-500">Installed At</span>
@@ -162,13 +158,13 @@
                                     </div>
                                 </div>
 
-                                <!-- Tab Content 2: Recovery Logs -->
+                                <!-- Recovery Logs with searchable customer list -->
                                 <div id="content-logs" class="hidden fade-in bg-white border border-gray-200 rounded-lg overflow-hidden h-[400px] flex flex-col">
                                     <div id="view-customers" class="flex-1 flex flex-col">
                                         <div class="p-4 border-b border-gray-200 bg-gray-50 flex items-center">
                                             <div class="relative w-full max-w-md">
                                                 <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-                                                <input type="text" class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-brand-500 focus:border-brand-500" placeholder="Search customer by name, email, or phone..." value="Sarah">
+                                                <input type="text" id="customer-search-input" oninput="filterCustomers()" class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-brand-500 focus:border-brand-500" placeholder="Search customer by name, email, or phone...">
                                             </div>
                                         </div>
                                         <div class="flex-1 overflow-y-auto p-4">
@@ -180,11 +176,21 @@
                                                         <th class="text-right text-xs font-medium text-gray-500 pb-2">Abandoned Carts</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="divide-y divide-gray-100">
-                                                    <tr class="cursor-pointer hover:bg-brand-100 transition-colors group" onclick="drillDown('view-customers', 'view-recoveries')">
+                                                <tbody id="customer-table-body" class="divide-y divide-gray-100">
+                                                    <tr class="customer-row cursor-pointer hover:bg-brand-100 transition-colors group" data-search="sarah smith sarah@example.com +1 555-0199" onclick="drillDown('view-customers', 'view-recoveries')">
                                                         <td class="py-3 text-sm font-medium text-brand-700 group-hover:text-brand-900">Sarah Smith</td>
                                                         <td class="py-3 text-sm text-gray-500">sarah@example.com <br> +1 555-0199</td>
                                                         <td class="py-3 text-sm text-gray-700 text-right">3</td>
+                                                    </tr>
+                                                    <tr class="customer-row cursor-pointer hover:bg-brand-100 transition-colors group" data-search="michael johnson michael@example.com +1 555-0244" onclick="drillDown('view-customers', 'view-recoveries')">
+                                                        <td class="py-3 text-sm font-medium text-brand-700 group-hover:text-brand-900">Michael Johnson</td>
+                                                        <td class="py-3 text-sm text-gray-500">michael@example.com <br> +1 555-0244</td>
+                                                        <td class="py-3 text-sm text-gray-700 text-right">1</td>
+                                                    </tr>
+                                                    <tr class="customer-row cursor-pointer hover:bg-brand-100 transition-colors group" data-search="emily davis emily@example.com +1 555-0388" onclick="drillDown('view-customers', 'view-recoveries')">
+                                                        <td class="py-3 text-sm font-medium text-brand-700 group-hover:text-brand-900">Emily Davis</td>
+                                                        <td class="py-3 text-sm text-gray-500">emily@example.com <br> +1 555-0388</td>
+                                                        <td class="py-3 text-sm text-gray-700 text-right">2</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -197,9 +203,9 @@
                                                 <button onclick="drillDown('view-recoveries', 'view-customers')" class="text-sm font-medium text-gray-600 hover:text-brand-600 flex items-center">
                                                     <i class="fas fa-arrow-left mr-2"></i> Back to Customers
                                                 </button>
-                                                <span class="ml-4 pl-4 border-l border-gray-300 text-sm font-bold text-gray-900">Sarah Smith</span>
+                                                <span class="ml-4 pl-4 border-l border-gray-300 text-sm font-bold text-gray-900">Selected Customer</span>
                                             </div>
-                                            <span class="text-xs text-gray-500">3 Total Recoveries</span>
+                                            <span class="text-xs text-gray-500">Recoveries List</span>
                                         </div>
                                         <div class="flex-1 overflow-y-auto p-4">
                                             <table class="min-w-full divide-y divide-gray-100">
@@ -225,6 +231,55 @@
                                 </div>
                             </td>
                         </tr>
+
+                        <!-- Tenant 2: Sneaker Hub -->
+                        <tr class="tenant-row hover:bg-gray-50 transition-colors cursor-pointer" data-name="sneaker hub" data-domain="sneaker-hub.myshopify.com">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-4 mr-4"></div>
+                                    <div class="h-10 w-10 rounded bg-brand-100 text-brand-800 flex items-center justify-center font-bold">SH</div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-bold text-gray-900">Sneaker Hub</div>
+                                        <div class="text-sm text-gray-500">sneaker-hub.myshopify.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">SUSPENDED</span></td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Basic Tier</td>
+                        </tr>
+
+                        <!-- Tenant 3: Urban Echo -->
+                        <tr class="tenant-row hover:bg-gray-50 transition-colors cursor-pointer" data-name="urban echo" data-domain="urban-echo.myshopify.com">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-4 mr-4"></div>
+                                    <div class="h-10 w-10 rounded bg-brand-100 text-brand-800 flex items-center justify-center font-bold">UE</div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-bold text-gray-900">Urban Echo</div>
+                                        <div class="text-sm text-gray-500">urban-echo.myshopify.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">ACTIVE</span></td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Enterprise</td>
+                        </tr>
+
+                        <!-- Tenant 4: Luxe Living -->
+                        <tr class="tenant-row hover:bg-gray-50 transition-colors cursor-pointer" data-name="luxe living" data-domain="luxe-living.myshopify.com">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-4 mr-4"></div>
+                                    <div class="h-10 w-10 rounded bg-brand-100 text-brand-800 flex items-center justify-center font-bold">LL</div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-bold text-gray-900">Luxe Living</div>
+                                        <div class="text-sm text-gray-500">luxe-living.myshopify.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">ACTIVE</span></td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Pro Tier</td>
+                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -238,7 +293,6 @@
                     <p class="text-sm text-gray-400 mt-1">Live metrics and telemetry dashboards.</p>
                 </div>
             </div>
-            <!-- Grafana Dashboard Image Container -->
             <div class="bg-[#111217] border border-gray-800 rounded-xl p-4 shadow-2xl">
                 <img src="assets/grapha-dashboard.png" alt="Grafana Observability Dashboard" class="w-full rounded-lg shadow-md">
             </div>
@@ -252,8 +306,8 @@
     <div id="drawer-panel" class="fixed inset-y-0 right-0 w-[450px] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col hidden border-l border-gray-200">
         <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-start bg-gray-50">
             <div>
-                <h2 class="text-lg font-bold text-gray-900">Sarah Smith</h2>
-                <p class="text-xs text-gray-500 mt-1">+1 555-0199 &bull; sarah@example.com</p>
+                <h2 class="text-lg font-bold text-gray-900">Customer Details</h2>
+                <p class="text-xs text-gray-500 mt-1">Selected Cart Diagnostic View</p>
                 <div class="mt-4 flex items-center space-x-4">
                     <span class="text-2xl font-bold text-gray-900">$150.00</span>
                     <span class="px-2.5 py-1 text-xs font-bold uppercase rounded-full bg-green-100 text-green-800">RECOVERED</span>
@@ -264,141 +318,94 @@
             </button>
         </div>
         
-        <!-- Drawer Tabs (Now includes Lifecycle Timeline) -->
         <div class="flex border-b border-gray-200 px-6 mt-2 space-x-6">
             <button id="drawer-tab-chat" onclick="switchDrawerTab('chat')" class="text-brand-700 font-semibold border-b-2 border-brand-700 pb-3 mt-3 text-sm">Conversation</button>
             <button id="drawer-tab-cart" onclick="switchDrawerTab('cart')" class="text-gray-500 font-medium pb-3 mt-3 hover:text-gray-700 border-b-2 border-transparent text-sm">Cart Details (2)</button>
             <button id="drawer-tab-lifecycle" onclick="switchDrawerTab('lifecycle')" class="text-gray-500 font-medium pb-3 mt-3 hover:text-gray-700 border-b-2 border-transparent text-sm">Lifecycle</button>
         </div>
         
-        <!-- Drawer Content -->
         <div class="flex-1 overflow-y-auto p-6 bg-white">
-            
-            <!-- Conversation View -->
             <div id="drawer-content-chat" class="space-y-6 fade-in">
                 <div class="flex flex-col items-end">
                     <div class="flex items-end space-x-2">
                         <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-br-none max-w-[280px] shadow-sm text-sm">
-                            Hi Sarah, looks like you left something behind! Here's a link to complete your purchase: https://cart.link/abc
+                            Hi there! Looks like you left something behind. Complete your checkout here: https://cart.link/abc
                         </div>
                         <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 text-xs shrink-0"><i class="fas fa-robot"></i></div>
                     </div>
-                    <span class="text-[11px] text-gray-400 mt-1 mr-10">Delivered &bull; Aug 29, 14:35</span>
-                </div>
-                
-                <div class="flex flex-col items-start">
-                    <div class="flex items-end space-x-2">
-                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs font-bold shrink-0">SS</div>
-                        <div class="bg-gray-100 border border-gray-200 text-gray-800 p-3 rounded-2xl rounded-bl-none max-w-[280px] shadow-sm text-sm">
-                            Do you have the sneakers in a size 8 instead?
-                        </div>
-                    </div>
-                    <span class="text-[11px] text-gray-400 mt-1 ml-10">Received &bull; Aug 29, 14:42</span>
-                </div>
-
-                <div class="flex flex-col items-end">
-                    <div class="flex items-end space-x-2">
-                        <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-br-none max-w-[280px] shadow-sm text-sm">
-                            Yes we do! I've updated your cart with the size 8. You can use the same link to check out.
-                        </div>
-                        <div class="w-8 h-8 rounded-full bg-brand-900 flex items-center justify-center text-white text-[10px] font-bold shrink-0">SA</div>
-                    </div>
-                    <span class="text-[11px] text-gray-400 mt-1 mr-10">Read &bull; Aug 29, 14:45</span>
+                    <span class="text-[11px] text-gray-400 mt-1 mr-10">Delivered</span>
                 </div>
             </div>
 
-            <!-- Cart Details View -->
             <div id="drawer-content-cart" class="hidden fade-in space-y-4">
                 <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center">
                     <div class="w-16 h-16 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center text-gray-300">
-                        <i class="fas fa-shoe-prints text-2xl"></i>
+                        <i class="fas fa-box text-2xl"></i>
                     </div>
                     <div class="ml-4 flex-1">
-                        <h4 class="text-sm font-bold text-gray-900">Classic Runner Sneaker</h4>
-                        <p class="text-xs text-gray-500 mt-1">Size 8 / White</p>
+                        <h4 class="text-sm font-bold text-gray-900">Sample Item Product</h4>
+                        <p class="text-xs text-gray-500 mt-1">Variant / Default</p>
                         <div class="mt-2 flex justify-between items-center">
                             <span class="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">Qty: 1</span>
-                            <span class="text-sm font-bold text-gray-900">$120.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center">
-                    <div class="w-16 h-16 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center text-gray-300">
-                        <i class="fas fa-socks text-2xl"></i>
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <h4 class="text-sm font-bold text-gray-900">Athletic Crew Socks</h4>
-                        <p class="text-xs text-gray-500 mt-1">One Size / Black</p>
-                        <div class="mt-2 flex justify-between items-center">
-                            <span class="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">Qty: 2</span>
-                            <span class="text-sm font-bold text-gray-900">$30.00</span>
+                            <span class="text-sm font-bold text-gray-900">$150.00</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Lifecycle Timeline View -->
             <div id="drawer-content-lifecycle" class="hidden fade-in space-y-6">
                 <div class="relative border-l-2 border-brand-200 ml-4 space-y-6 pl-6 pt-2">
-                    
-                    <!-- Milestone 1 -->
                     <div class="relative">
                         <div class="absolute -left-[31px] bg-brand-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">
                             <i class="fas fa-cart-arrow-down"></i>
                         </div>
                         <h4 class="text-sm font-bold text-gray-900">Cart Abandoned & Detected</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">Aug 29, 2026 - 14:30 UTC</p>
-                        <p class="text-xs text-gray-600 mt-1 bg-gray-50 p-2 rounded border border-gray-200">Webhook received from Shopify. Status set to <code class="text-brand-700 font-semibold">DETECTED</code>.</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Webhook received from Shopify.</p>
                     </div>
-
-                    <!-- Milestone 2 -->
-                    <div class="relative">
-                        <div class="absolute -left-[31px] bg-brand-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h4 class="text-sm font-bold text-gray-900">Delay Window Elapsed</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">Aug 29, 2026 - 15:00 UTC</p>
-                        <p class="text-xs text-gray-600 mt-1 bg-gray-50 p-2 rounded border border-gray-200">Configured recovery delay of 30 minutes completed successfully.</p>
-                    </div>
-
-                    <!-- Milestone 3 -->
-                    <div class="relative">
-                        <div class="absolute -left-[31px] bg-brand-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">
-                            <i class="fas fa-paper-plane"></i>
-                        </div>
-                        <h4 class="text-sm font-bold text-gray-900">Automated SMS Dispatched</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">Aug 29, 2026 - 15:01 UTC</p>
-                        <p class="text-xs text-gray-600 mt-1 bg-gray-50 p-2 rounded border border-gray-200">Outbound message sent via Twilio provider. Status: <code class="text-brand-700 font-semibold">DELIVERED</code>.</p>
-                    </div>
-
-                    <!-- Milestone 4 -->
-                    <div class="relative">
-                        <div class="absolute -left-[31px] bg-brand-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">
-                            <i class="fas fa-reply"></i>
-                        </div>
-                        <h4 class="text-sm font-bold text-gray-900">Customer Replied</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">Aug 29, 2026 - 15:08 UTC</p>
-                        <p class="text-xs text-gray-600 mt-1 bg-gray-50 p-2 rounded border border-gray-200">Customer asked about product sizing; support agent intervened.</p>
-                    </div>
-
-                    <!-- Milestone 5 -->
                     <div class="relative">
                         <div class="absolute -left-[31px] bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">
                             <i class="fas fa-check"></i>
                         </div>
                         <h4 class="text-sm font-bold text-gray-900">Recovery Outcome: SUCCESS</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">Aug 29, 2026 - 15:15 UTC</p>
-                        <p class="text-xs text-gray-600 mt-1 bg-green-50 p-2 rounded border border-green-200 text-green-800">Checkout completed successfully. Total recovered revenue: <strong class="font-bold">$150.00</strong>.</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Checkout completed successfully.</p>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
+        // Real-time Tenant Search Filter
+        function filterTenants() {
+            const query = document.getElementById('global-tenant-search').value.toLowerCase();
+            const rows = document.querySelectorAll('.tenant-row');
+            
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name');
+                const domain = row.getAttribute('data-domain');
+                if (name.includes(query) || domain.includes(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // Real-time Customer Search Filter inside Expanded Row
+        function filterCustomers() {
+            const query = document.getElementById('customer-search-input').value.toLowerCase();
+            const rows = document.querySelectorAll('.customer-row');
+
+            rows.forEach(row => {
+                const searchData = row.getAttribute('data-search');
+                if (searchData.includes(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
         function switchPage(page) {
             const tenantsPage = document.getElementById('page-tenants');
             const obsPage = document.getElementById('page-observability');
