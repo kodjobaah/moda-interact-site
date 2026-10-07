@@ -273,10 +273,11 @@ h1 {
   box-shadow: var(--shadow);
 }
 
-.video-wrap video {
+.video-wrap iframe {
   display: block;
   width: 100%;
   max-width: 100%;
+  border: 0;
   border-radius: 18px;
   background: #0b0f0d;
   aspect-ratio: 16 / 9;
