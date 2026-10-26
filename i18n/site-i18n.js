@@ -68,7 +68,6 @@
       [/^(\d+) conversations$/, 'conversations'],
       [/^(\d+) monthly recovery conversations\.$/, 'monthlyRecovery'],
       [/^(\d+) lifetime conversations$/, 'lifetimeRecovery'],
-      [/^£(\d+) pack$/, 'pack'],
     ];
     for (const [regex, key] of rules) {
       const match = source.match(regex);

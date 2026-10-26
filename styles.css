@@ -511,6 +511,25 @@ footer {
   align-items: stretch;
 }
 
+.proposal-notice {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border: 1px solid #e7c77f;
+  border-left: 4px solid #a75b00;
+  border-radius: 8px;
+  background: #fff8e8;
+  color: #46330e;
+}
+
+.proposal-notice strong {
+  display: block;
+  color: #533700;
+}
+
+.proposal-notice p {
+  margin: 6px 0 0;
+}
+
 .plan-card {
   position: relative;
   background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);

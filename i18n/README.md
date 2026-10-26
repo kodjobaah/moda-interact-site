@@ -38,6 +38,8 @@ node i18n/check-locale-resolution.js
 
 The builder fails if a locale has missing/extra keys or if `--check` finds that the generated bundle is stale.
 
+Pricing proposal copy without reviewed translations intentionally uses the existing English-source fallback. Remove obsolete pricing translations from locale catalogues so other locales cannot display conflicting prices or production terms.
+
 ## Local testing
 
 The generated catalogue is JavaScript rather than runtime-fetched JSON so the language selector also works with a local `file://` preview, for example:
